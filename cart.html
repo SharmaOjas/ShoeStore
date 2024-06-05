@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width-device-width, initial-scale=1.0">
+    <title>All Products - Redstore</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <a href="index.html"><img src="images/logo.png" width="125px"></a>
+            </div>
+            <nav>
+                <ul id="MenuItems">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="">About</a></li>
+                    <li><a href="">Contact</a></li>
+                    <li><a href="http://localhost/firstdb/form2.php">Account</a></li>
+                </ul>
+            </nav>
+            <a href="cart.html"><img src="images/cart.png" width="30px" height="30px"></a>
+            <img src="images/menu.png" class="menu-icon" onClick="menutoggle()" >
+        </div>
+    </div>
+    <div class="small-container cart-page">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="cartItemsTableBody">
+                <!-- Cart items will be dynamically generated here -->
+            </tbody>
+        </table>
+        <hr>
+        
+        <div id="totalRow" style="margin-left: 710px;">
+            <strong>Total:</strong> <span id="cartTotal">₹0.00</span>
+            <button class="btn3" style="margin-left: 75px;" onclick="window.location.href='payment.html'">Checkout</button>
+        </div>
+        
+        
+        <!-- Checkout button -->
+        
+    </div>
+    
+    
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="footer-col-2">
+                    <img src="images/logo-white.png">
+                    <p>Our Purpose Is To Sustainably Make the Pleasure and Benefits of Sports Accessible to the Many.</p>
+                </div>
+                <div class="footer-col-3">
+                    <h3>Useful Links</h3>
+                    <ul>
+                        <li>Coupons</li>
+                        <li>Blog Post</li>
+                        <li>Return Policy</li>
+                        <li>Join Affiliate</li>
+                    </ul>
+                </div>
+                <div class="footer-col-4">
+                    <h3>Follow us</h3>
+                    <ul>
+                        <li>Facebook</li>
+                        <li>Twitter</li>
+                        <li>Instagram</li>
+                        <li>Youtube</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            
+        </div>
+    </div>
+
+    <script>
+        var menuItems = document.getElementById("MenuItems");
+        MenuItems.style.maxHeight = "0px";
+
+        function menutoggle() {
+            if (MenuItems.style.maxHeight == "0px") {
+                MenuItems.style.maxHeight = "200px";
+            } else {
+                MenuItems.style.maxHeight = "0px";
+            }
+        }
+
+        // Function to remove an item from the cart
+        function removeFromCart(index) {
+            var cartItems = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : [];
+
+            // Remove the item from the cart based on its index
+            cartItems.splice(index, 1);
+
+            // Update the cart items in the local storage
+            localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+            // Display the updated cart items
+            displayCartItems();
+        }
+
+        // Function to update subtotal when quantity changes
+        function updateSubtotal(row, item) {
+            var quantityInput = row.querySelector('input[type="number"]');
+            var subtotalCell = row.querySelector('.subtotal');
+
+            // Calculate subtotal
+            var subtotal = item.price * parseInt(quantityInput.value);
+            subtotalCell.textContent = '₹' + subtotal.toFixed(2);
+        }
+
+        // Function to display cart items on the cart page
+        function displayCartItems() {
+            var cartItems = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : [];
+            var cartItemsTableBody = document.getElementById('cartItemsTableBody');
+            var cartTotalSpan = document.getElementById('cartTotal');
+            var cartTotal = 0;
+
+            // Clear previous items
+            cartItemsTableBody.innerHTML = '';
+
+            // Loop through each item in the cart and generate HTML to display it
+            cartItems.forEach(function(item) {
+                var row = document.createElement('tr');
+
+                // Image cell
+                var imageCell = document.createElement('td');
+                var image = document.createElement('img');
+                image.src = item.image; // Set the src attribute to the image URL
+                image.alt = item.name; // Set alt attribute to provide alternative text for accessibility
+                imageCell.appendChild(image);
+                row.appendChild(imageCell);
+
+                // Product name cell
+                var productNameCell = document.createElement('td');
+                productNameCell.textContent = item.name;
+                row.appendChild(productNameCell);
+
+                // Quantity cell
+                var quantityCell = document.createElement('td');
+                var quantityInput = document.createElement('input');
+                quantityInput.type = 'number';
+                quantityInput.value = 1; // You can set the initial quantity here
+                quantityInput.addEventListener('input', function() {
+                    updateSubtotal(row, item);
+                    updateCartTotal();
+                });
+                quantityCell.appendChild(quantityInput);
+                row.appendChild(quantityCell);
+
+                // Subtotal cell
+                var subtotalCell = document.createElement('td');
+                subtotalCell.className = 'subtotal';
+                subtotalCell.textContent = '₹' + (item.price * quantityInput.value).toFixed(2);
+                row.appendChild(subtotalCell);
+
+                // Remove button cell
+                var removeButtonCell = document.createElement('td');
+                var removeButton = document.createElement('button');
+                removeButton.textContent = 'Remove';
+                removeButton.onclick = function() {
+                    removeFromCart(cartItems.indexOf(item));
+                };
+                removeButtonCell.appendChild(removeButton);
+                row.appendChild(removeButtonCell);
+
+                cartItemsTableBody.appendChild(row);
+
+                // Add the subtotal to the cart total
+                cartTotal += item.price * parseInt(quantityInput.value);
+            });
+
+            // Update the cart total
+            cartTotalSpan.textContent = '₹' + cartTotal.toFixed(2);
+        }
+
+        // Update cart total
+        function updateCartTotal() {
+            var cartTotalSpan = document.getElementById('cartTotal');
+            var cartTotal = 0;
+
+            var subtotalCells = document.querySelectorAll('.subtotal');
+            subtotalCells.forEach(function(cell) {
+                cartTotal += parseFloat(cell.textContent.replace('₹', ''));
+            });
+
+            // Update the cart total
+            cartTotalSpan.textContent = '₹' + cartTotal.toFixed(2);
+        }
+
+        // Call the function to display cart items when the page loads
+        displayCartItems();
+    </script>
+</body>
+</html>

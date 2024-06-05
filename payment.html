@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Gateway</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="payment-form">
+            <h2>Payment Gateway</h2>
+            <hr>
+            <h4>Total Amount: <span id="cartTotal">₹0</span></h4> <!-- Display total amount from the cart -->
+        </div>
+
+        <!-- Payment form -->
+        <form id="paymentForm">
+            <div class="form-group">
+                <label for="cardName">Name on Card:</label>
+                <input type="text" class="form-control" id="cardName" required>
+            </div>
+            <div class="form-group">
+                <label for="cardNumber">Card Number:</label>
+                <input type="text" class="form-control" id="cardNumber" required>
+            </div>
+            <div class="form-group">
+                <label for="expiry">Expiry Date:</label>
+                <input type="text" class="form-control" id="expiry" placeholder="MM/YYYY" required>
+            </div>
+            <div class="form-group">
+                <label for="cvv">CVV:</label>
+                <input type="text" class="form-control" id="cvv" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-pay">Pay Now</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Function to fetch total amount from the cart and update the payment form
+            function updateTotalAmount() {
+                var cartTotal = getCartTotal();
+                $('#cartTotal').text('₹' + cartTotal.toFixed(2));
+            }
+
+            // Call the function to update total amount on page load
+            updateTotalAmount();
+
+            // Function to calculate total amount from the cart
+            function getCartTotal() {
+                var cartItems = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : [];
+                var total = 0;
+                cartItems.forEach(function (item) {
+                    // Check if item has a quantity property, if not, set it to 1
+                    if (!item.quantity) {
+                        item.quantity = 1;
+                    }
+                    total += item.price * item.quantity;
+                });
+                return total;
+            }
+        });
+    </script>
+</body>
+
+</html>
